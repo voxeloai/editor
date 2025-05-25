@@ -349,8 +349,8 @@ class SingleSplat {
                         }
                     });
 
-                    const { blackPoint, whitePoint, brightness, tintClr } = splat;
-                    const hasTint = (!tintClr.equals(Color.WHITE) || blackPoint !== 0 || whitePoint !== 1 || brightness !== 1);
+                    const { tintClr, temperature, saturation, brightness, blackPoint, whitePoint } = splat;
+                    const hasTint = (!tintClr.equals(Color.WHITE) || temperature !== 0 || saturation !== 1 || brightness !== 1 || blackPoint !== 0 || whitePoint !== 1);
 
                     cacheEntry = { splat, transformCache, srcProps, hasTint };
 
@@ -404,28 +404,55 @@ class SingleSplat {
             }
 
             if (!serializeSettings.keepColorTint && hasColor && hasTint) {
-                const { blackPoint, whitePoint, brightness, tintClr } = splat;
+                const { tintClr, temperature, saturation, brightness, blackPoint, whitePoint } = splat;
 
                 const SH_C0 = 0.28209479177387814;
                 const to = (value: number) => value * SH_C0 + 0.5;
                 const from = (value: number) => (value - 0.5) / SH_C0;
 
+                const applyTransform = (c: { r: number, g: number, b: number }, s: { r: number, g: number, b: number }, offset: number) => {
+                    // offset and scale
+                    c.r = offset + c.r * s.r;
+                    c.g = offset + c.g * s.g;
+                    c.b = offset + c.b * s.b;
+
+                    // saturation
+                    const grey = c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+                    c.r = grey + (c.r - grey) * saturation;
+                    c.g = grey + (c.g - grey) * saturation;
+                    c.b = grey + (c.b - grey) * saturation;
+                };
+
                 const offset = -blackPoint + brightness;
                 const scale = 1 / (whitePoint - blackPoint);
 
-                const tr = tintClr.r * scale;
-                const tg = tintClr.g * scale;
-                const tb = tintClr.b * scale;
+                const s = {
+                    r: scale * tintClr.r * (1 + temperature),
+                    g: scale * tintClr.g,
+                    b: scale * tintClr.b * (1 - temperature)
+                };
 
-                data.f_dc_0 = from(offset + to(data.f_dc_0) * tr);
-                data.f_dc_1 = from(offset + to(data.f_dc_1) * tg);
-                data.f_dc_2 = from(offset + to(data.f_dc_2) * tb);
+                const c = {
+                    r: to(data.f_dc_0),
+                    g: to(data.f_dc_1),
+                    b: to(data.f_dc_2)
+                };
+
+                applyTransform(c, s, offset);
+                data.f_dc_0 = from(c.r);
+                data.f_dc_1 = from(c.g);
+                data.f_dc_2 = from(c.b);
 
                 if (dstSHBands > 0) {
                     for (let d = 0; d < dstSHCoeffs; ++d) {
-                        data[shNames[d]] *= tr;
-                        data[shNames[d + dstSHCoeffs]] *= tg;
-                        data[shNames[d + dstSHCoeffs * 2]] *= tb;
+                        c.r = data[shNames[d]];
+                        c.g = data[shNames[d + dstSHCoeffs]];
+                        c.b = data[shNames[d + dstSHCoeffs * 2]];
+
+                        applyTransform(c, s, 0);
+                        data[shNames[d]] = c.r;
+                        data[shNames[d + dstSHCoeffs]] = c.g;
+                        data[shNames[d + dstSHCoeffs * 2]] = c.b;
                     }
                 }
             }
@@ -765,9 +792,9 @@ const sortSplats = (splats: Splat[], indices: CompressedIndex[]) => {
                 const y = centers[i * 3 + 1];
                 const z = centers[i * 3 + 2];
 
-                const ix = Math.floor(1024 * (x - minx) / xlen);
-                const iy = Math.floor(1024 * (y - miny) / ylen);
-                const iz = Math.floor(1024 * (z - minz) / zlen);
+                const ix = Math.min(1023, Math.floor(1024 * (x - minx) / xlen));
+                const iy = Math.min(1023, Math.floor(1024 * (y - miny) / ylen));
+                const iz = Math.min(1023, Math.floor(1024 * (z - minz) / zlen));
 
                 morton[idx++] = encodeMorton3(ix, iy, iz);
             }
@@ -888,6 +915,13 @@ const serializePlyCompressed = async (splats: Splat[], options: SerializeSetting
             for (let k = 0; k < outputSHCoeffs * 3; ++k) {
                 const nvalue = singleSplat.data[shNames[k]] / 8 + 0.5;
                 dataView.setUint8(off++, Math.max(0, Math.min(255, Math.trunc(nvalue * 256))));
+            }
+        }
+
+        // pad the end of the last chunk with duplicate data
+        if (num < 256) {
+            for (let j = num; j < 256; ++j) {
+                chunk.set(j, singleSplat);
             }
         }
 
@@ -1013,13 +1047,13 @@ const serializeViewer = async (splats: Splat[], options: ViewerExportSettings, w
         const style = '<link rel="stylesheet" href="./index.css">';
         const script = '<script type="module" src="./index.js"></script>';
         const settings = 'settings: fetch(settingsUrl).then(response => response.json())';
-        const content = 'contentUrl,';
+        const content = 'fetch(contentUrl)';
 
         const html = indexHtml
         .replace(style, `<style>\n${pad(indexCss, 12)}\n        </style>`)
         .replace(script, `<script type="module">\n${pad(indexJs, 12)}\n        </script>`)
         .replace(settings, `settings: ${JSON.stringify(experienceSettings)}`)
-        .replace(content, `contentUrl: "data:application/ply;base64,${encodeBase64(plyBuffer)}",`);
+        .replace(content, `fetch("data:application/ply;base64,${encodeBase64(plyBuffer)}")`);
 
         await writer.write(new TextEncoder().encode(html), true);
     } else {
