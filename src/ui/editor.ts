@@ -9,7 +9,8 @@ import { ImageSettingsDialog } from './image-settings-dialog';
 import { localize, localizeInit } from './localization';
 import { Menu } from './menu';
 import { ModeToggle } from './mode-toggle';
-import logo from './playcanvas-logo.png';
+// import logo from './playcanvas-logo.png';
+import logo from './voxelo-logo.png';
 import { Popup, ShowOptions } from './popup';
 import { PublishSettingsDialog } from './publish-settings-dialog';
 import { RightToolbar } from './right-toolbar';
@@ -68,7 +69,7 @@ class EditorUI {
         // app label
         const appLabel = new Label({
             id: 'app-label',
-            text: `SUPERSPLAT v${version}`
+            text: `Voxelo.ai v${version}`
         });
 
         // cursor label
@@ -243,7 +244,7 @@ class EditorUI {
             return this.popup.show({
                 type: 'info',
                 header: 'About',
-                message: `SUPERSPLAT v${version}`
+                message: `Voxelo.ai splat editor v${version}`
             });
         });
 

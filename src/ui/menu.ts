@@ -291,41 +291,6 @@ class Menu extends Container {
             .focus(),
       },
       {
-        text: localize("help.github-repo"),
-        icon: "E259",
-        onSelect: () =>
-          window
-            .open("https://github.com/playcanvas/supersplat", "_blank")
-            .focus(),
-      },
-      {
-        // separator
-      },
-      {
-        text: localize("help.basics-video"),
-        icon: "E261",
-        onSelect: () =>
-          window.open("https://youtu.be/MwzaEM2I55I", "_blank").focus(),
-      },
-      {
-        // separator
-      },
-      {
-        text: localize("help.discord"),
-        icon: "E233",
-        onSelect: () =>
-          window.open("https://discord.gg/T3pnhRTTAY", "_blank").focus(),
-      },
-      {
-        text: localize("help.forum"),
-        icon: "E432",
-        onSelect: () =>
-          window.open("https://forum.playcanvas.com", "_blank").focus(),
-      },
-      {
-        // separator
-      },
-      {
         text: localize("help.about"),
         icon: "E138",
         onSelect: () => events.invoke("show.about"),
