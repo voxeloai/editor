@@ -296,57 +296,57 @@ class Menu extends Container {
         icon: "E136",
         onSelect: () => events.fire("show.shortcuts"),
       },
-      {
-        text: localize("menu.help.user-guide"),
-        icon: "E232",
-        onSelect: () =>
-          window
-            .open(
-              "https://developer.playcanvas.com/user-manual/gaussian-splatting/editing/supersplat/",
-              "_blank"
-            )
-            .focus(),
-      },
-      {
-        text: localize("menu.help.log-issue"),
-        icon: "E336",
-        onSelect: () =>
-          window
-            .open("https://github.com/playcanvas/supersplat/issues", "_blank")
-            .focus(),
-      },
-      {
-        text: localize("menu.help.github-repo"),
-        icon: "E259",
-        onSelect: () =>
-          window
-            .open("https://github.com/playcanvas/supersplat", "_blank")
-            .focus(),
-      },
-      {
-        // separator
-      },
-      {
-        text: localize("menu.help.basics-video"),
-        icon: "E261",
-        onSelect: () =>
-          window.open("https://youtu.be/MwzaEM2I55I", "_blank").focus(),
-      },
-      {
-        // separator
-      },
-      {
-        text: localize("menu.help.discord"),
-        icon: "E233",
-        onSelect: () =>
-          window.open("https://discord.gg/T3pnhRTTAY", "_blank").focus(),
-      },
-      {
-        text: localize("menu.help.forum"),
-        icon: "E432",
-        onSelect: () =>
-          window.open("https://forum.playcanvas.com", "_blank").focus(),
-      },
+      // {
+      //   text: localize("menu.help.user-guide"),
+      //   icon: "E232",
+      //   onSelect: () =>
+      //     window
+      //       .open(
+      //         "https://developer.playcanvas.com/user-manual/gaussian-splatting/editing/supersplat/",
+      //         "_blank"
+      //       )
+      //       .focus(),
+      // },
+      // {
+      //   text: localize("menu.help.log-issue"),
+      //   icon: "E336",
+      //   onSelect: () =>
+      //     window
+      //       .open("https://github.com/playcanvas/supersplat/issues", "_blank")
+      //       .focus(),
+      // },
+      // {
+      //   text: localize("menu.help.github-repo"),
+      //   icon: "E259",
+      //   onSelect: () =>
+      //     window
+      //       .open("https://github.com/playcanvas/supersplat", "_blank")
+      //       .focus(),
+      // },
+      // {
+      //   // separator
+      // },
+      // {
+      //   text: localize("menu.help.basics-video"),
+      //   icon: "E261",
+      //   onSelect: () =>
+      //     window.open("https://youtu.be/MwzaEM2I55I", "_blank").focus(),
+      // },
+      // {
+      //   // separator
+      // },
+      // {
+      //   text: localize("menu.help.discord"),
+      //   icon: "E233",
+      //   onSelect: () =>
+      //     window.open("https://discord.gg/T3pnhRTTAY", "_blank").focus(),
+      // },
+      // {
+      //   text: localize("menu.help.forum"),
+      //   icon: "E432",
+      //   onSelect: () =>
+      //     window.open("https://forum.playcanvas.com", "_blank").focus(),
+      // },
       {
         // separator
       },
